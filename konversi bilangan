@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konversi Bilangan Komputer | Biner, Desimal, Oktal, Heksa</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+    body {
+      background: linear-gradient(145deg, #0b1a2e 0%, #1b2f44 100%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 2.5rem;
+      box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+      width: 100%;
+      max-width: 1000px;
+      padding: 2rem 2rem 2.5rem;
+      transition: all 0.2s;
+    }
+    h1 {
+      color: #b7e4ff;
+      font-weight: 500;
+      font-size: 2.2rem;
+      letter-spacing: -0.5px;
+      margin: 0 0 0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h1 span {
+      background: #2d4d6e;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #cae6ff;
+      letter-spacing: 0.3px;
+    }
+    .sub {
+      color: #92b9d9;
+      margin-bottom: 2.5rem;
+      border-left: 4px solid #2e7ea1;
+      padding-left: 1.2rem;
+      font-size: 1.1rem;
+      background: linear-gradient(to right, #1f3f57, transparent);
+    }
+    .converter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    @media (max-width: 680px) {
+      .converter-grid {
+        grid-template-columns: 1fr;
+        gap: 1.8rem;
+      }
+    }
+    .converter-panel {
+      background: #102433c9;
+      border-radius: 2rem;
+      padding: 1.6rem 1.5rem 1.8rem;
+      border: 1px solid #2b4a68;
+      box-shadow: 0 10px 20px -5px #03080e;
+    }
+    .panel-title {
+      color: #d7edff;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 0.9rem;
+      margin-bottom: 1.3rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .panel-title i {
+      font-size: 1.2rem;
+      color: #51b0e8;
+    }
+    .input-group {
+      margin-bottom: 1.4rem;
+    }
+    .input-group label {
+      display: block;
+      color: #b0d0ea;
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-bottom: 0.3rem;
+      letter-spacing: 0.3px;
+    }
+    .input-field {
+      width: 100%;
+      background: #09161f;
+      border: 1px solid #264a64;
+      border-radius: 40px;
+      padding: 0.9rem 1.2rem;
+      font-size: 1.1rem;
+      color: #e3f0ff;
+      outline: none;
+      transition: 0.15s;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+    .input-field:focus {
+      border-color: #3d91c9;
+      box-shadow: 0 0 0 2px #1f5580;
+      background: #0c1d2b;
+    }
+    .input-field::placeholder {
+      color: #3d5e79;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+    .result-box {
+      background: #0d202f;
+      border-radius: 28px;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid #2e5570;
+      margin-top: 1rem;
+      word-break: break-word;
+    }
+    .result-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0.4rem 0;
+      border-bottom: 1px dashed #264a64;
+    }
+    .result-item:last-child {
+      border-bottom: none;
+    }
+    .result-label {
+      color: #77b3dd;
+      font-weight: 300;
+      font-size: 0.95rem;
+    }
+    .result-value {
+      color: #f2f9ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    .badge-base {
+      background: #1d4863;
+      border-radius: 20px;
+      padding: 0.2rem 0.9rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #cbe6fe;
+      margin-left: 0.6rem;
+      text-transform: uppercase;
+    }
+    .info-footer {
+      margin-top: 2.8rem;
+      background: #0b1c2bdc;
+      border-radius: 40px;
+      padding: 1.2rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #2b5572;
+      color: #b0d3f0;
+    }
+    .info-footer small {
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .info-footer .note {
+      font-family: monospace;
+      background: #1f3f55;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      color: #b5defa;
+    }
+    hr {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #3b6f94, transparent);
+      margin: 1.8rem 0 1rem;
+    }
+    .system-badge {
+      display: inline-block;
+      background: #173e57;
+      border-radius: 16px;
+      padding: 0.2rem 1rem;
+      font-size: 0.8rem;
+      color: #b3defa;
+      margin-right: 0.5rem;
+      border: 1px solid #2c6d97;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1>
+    ⚡ basis Kalkulator
+    <span>Biner · Desimal · Oktal · Heksa</span>
+  </h1>
+  <div class="sub">Konversi instan bilangan komputer — validasi & presisi tinggi</div>
+
+  <div class="converter-grid">
+    <!-- PANEL KIRI: Dari Desimal ke semuanya -->
+    <div class="converter-panel">
+      <div class="panel-title">
+        <i>🔢</i> MASUKKAN DESIMAL
+      </div>
+      <div class="input-group">
+        <label>Angka desimal (basis 10)</label>
+        <input type="number" id="inputDesimal" class="input-field" placeholder="misal: 42" value="42">
+      </div>
+      <div class="result-box">
+        <div class="result-item">
+          <span class="result-label">Biner <span class="badge-base">bin</span></span>
+          <span class="result-value" id="desKeBiner">101010</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Oktal <span class="badge-base">oct</span></span>
+          <span class="result-value" id="desKeOktal">52</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Heksadesimal <span class="badge-base">hex</span></span>
+          <span class="result-value" id="desKeHeksa">2A</span>
+        </div>
+      </div>
+      <div style="margin-top: 1rem; font-size: 0.8rem; color: #6f9bc0; text-align: right;">
+        ⚡ otomatis konversi
+      </div>
+    </div>
+
+    <!-- PANEL KANAN: Dari Biner/Octal/Hex -> DESIMAL (multi-konversi) -->
+    <div class="converter-panel">
+      <div class="panel-title">
+        <i>🔀</i> KONVERSI BERBASIS LAIN
+      </div>
+      <!-- Input Biner -->
+      <div class="input-group">
+        <label>📥 Biner (0/1)</label>
+        <input type="text" id="inputBiner" class="input-field" placeholder="contoh: 1010" value="1010">
+      </div>
+      <!-- Input Oktal -->
+      <div class="input-group">
+        <label>📥 Oktal (0-7)</label>
+        <input type="text" id="inputOktal" class="input-field" placeholder="contoh: 52" value="52">
+      </div>
+      <!-- Input Heksadesimal -->
+      <div class="input-group">
+        <label>📥 Heksadesimal (0-9 A-F)</label>
+        <input type="text" id="inputHeksa" class="input-field" placeholder="contoh: 2A" value="2A">
+      </div>
+
+      <!-- Hasil Desimal dari ketiga input di atas -->
+      <div class="result-box" style="margin-top: 0.5rem;">
+        <div class="result-item">
+          <span class="result-label">➡️ Desimal (dari Biner)</span>
+          <span class="result-value" id="binerKeDes">10</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">➡️ Desimal (dari Oktal)</span>
+          <span class="result-value" id="oktalKeDes">42</span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">➡️ Desimal (dari Heksa)</span>
+          <span class="result-value" id="heksaKeDes">42</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFORMASI TAMBAHAN & BILANGAN KOMPUTER LAINNYA -->
+  <hr>
+  <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <span class="system-badge">BCD</span>
+      <span class="system-badge">ASCII (7-bit)</span>
+      <span class="system-badge">Base64</span>
+      <span class="system-badge">Kode Gray</span>
+      <span class="system-badge">Signed int</span>
+    </div>
+    <div style="color:#aac6e2;">
+      <span style="opacity: 0.7;">⚙️ </span><strong style="font-weight:400;">32-bit / 64-bit</strong> <span style="font-family: monospace;">two's complement</span>
+    </div>
+  </div>
+
+  <!-- Fitur informasi tambahan BCD, Gray, dsb (simulasi nilai) -->
+  <div class="info-footer">
+    <small>💡 <b>8421 (BCD)</b> dari desimal <span id="demoBcdLabel">42</span> : <span id="demoBcdValue" style="font-family: monospace;background:#0f293d;padding:2px 8px;border-radius:20px;">0100 0010</span></small>
+    <small class="note">🖥️ bilangan komplemen-2 (8 bit) : <span id="demoTwosComp">00101010</span></small>
+  </div>
+  <div style="display: flex; justify-content: flex-end; margin-top: 0.5rem; color: #487396; gap: 2rem; flex-wrap: wrap;">
+    <small>✔️ gray code (4-bit) : <span id="demoGray">0011</span> (dari des rendah)</small>
+    <small>✔️ excess-3 : <span id="demoExcess3">0111 0101</span></small>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // --- ELEMEN DESIMAL (panel kiri)
+    const inputDesimal = document.getElementById('inputDesimal');
+    const desKeBiner = document.getElementById('desKeBiner');
+    const desKeOktal = document.getElementById('desKeOktal');
+    const desKeHeksa = document.getElementById('desKeHeksa');
+
+    // --- ELEMEN INPUT LAIN (panel kanan)
+    const inputBiner = document.getElementById('inputBiner');
+    const inputOktal = document.getElementById('inputOktal');
+    const inputHeksa = document.getElementById('inputHeksa');
+
+    // --- ELEMEN HASIL DESIMAL (panel kanan)
+    const binerKeDes = document.getElementById('binerKeDes');
+    const oktalKeDes = document.getElementById('oktalKeDes');
+    const heksaKeDes = document.getElementById('heksaKeDes');
+
+    // --- ELEMEN DEMO TAMBAHAN
+    const demoBcdLabel = document.getElementById('demoBcdLabel');
+    const demoBcdValue = document.getElementById('demoBcdValue');
+    const demoTwosComp = document.getElementById('demoTwosComp');
+    const demoGray = document.getElementById('demoGray');
+    const demoExcess3 = document.getElementById('demoExcess3');
+
+    // --- Helper: validasi & bersihkan spasi, uppercase
+    const cleanStr = (s) => s.trim().replace(/\s+/g, '').toUpperCase();
+
+    // --- Fungsi konversi desimal ke basis lain
+    function updateDariDesimal() {
+      let desStr = inputDesimal.value.trim();
+      if (desStr === '') desStr = '0';
+      // ubah ke number (preserve integer, karena desimal bisa besar tapi kita batasi untuk kewarasan)
+      let des = Number(desStr);
+      if (isNaN(des) || !Number.isFinite(des)) {
+        // fallback
+        des = 0;
+        inputDesimal.value = 0;
+      }
+      // bulatkan integer (karena bilangan komputer umumnya integer)
+      const desInt = Math.floor(des);  // kita ambil integer (untuk bin/okt/hex)
+      if (String(desInt) !== desStr && !desStr.includes('.')) {
+        // jika misal '42.5' kita tetap paksa floor untuk bin/okt/hex, tapi tampilkan integer
+        // kita biarkan input bisa float, tapi konversi biner dll berdasarkan floor
+      }
+      // update label BCD dll dari nilai desInt
+      demoBcdLabel.innerText = desInt;
+
+      // BCD sederhana (4 bit per digit desimal) — hanya untuk ilustrasi (digit desimal terpisah)
+      const bcdDigits = String(desInt).split('').map(d => {
+        const digit = parseInt(d, 10);
+        return digit.toString(2).padStart(4, '0');
+      }).join(' ');
+      demoBcdValue.innerText = bcdDigits || '0';
+
+      // two's complement 8 bit (representasi untuk nilai -128..127)
+      let twosComp8 = '';
+      if (desInt >= -128 && desInt <= 127) {
+        if (desInt >= 0) {
+          twosComp8 = desInt.toString(2).padStart(8, '0');
+        } else {
+          // negative: two's complement (256 + desInt)
+          let val = 256 + desInt;  // karena desInt negatif
+          twosComp8 = val.toString(2).padStart(8, '0');
+        }
+      } else {
+        twosComp8 = 'N/A (luar 8-bit)';
+      }
+      demoTwosComp.innerText = twosComp8;
+
+      // Gray code sederhana (dari nilai rendah 0-15 saja, untuk demo)
+      let lowNibble = desInt & 0xF; // 4 bit terbawah
+      let gray = (lowNibble ^ (lowNibble >> 1)).toString(2).padStart(4, '0');
+      demoGray.innerText = gray;
+
+      // Excess-3 (8421 + 3 tiap digit desimal) sederhana untuk demo
+      let excessStr = String(desInt).split('').map(d => {
+        let digit = parseInt(d, 10);
+        let ex = digit + 3;
+        return ex.toString(2).padStart(4, '0');
+      }).join(' ');
+      demoExcess3.innerText = excessStr || '0';
+
+      // konversi ke biner, oktal, heksa (dari integer)
+      desKeBiner.innerText = desInt.toString(2);
+      desKeOktal.innerText = desInt.toString(8);
+      desKeHeksa.innerText = desInt.toString(16).toUpperCase();
+    }
+
+    // --- Fungsi update dari input biner/oktal/hex ke desimal
+    function updateDariLain() {
+      // BINER -> DESIMAL
+      let binerStr = cleanStr(inputBiner.value);
+      let binerValid = /^[01]+$/.test(binerStr);
+      if (binerValid && binerStr.length > 0) {
+        try {
+          let desDariBiner = parseInt(binerStr, 2);
+          if (!isNaN(desDariBiner)) binerKeDes.innerText = desDariBiner;
+          else binerKeDes.innerText = '?';
+        } catch { binerKeDes.innerText = 'ERR'; }
+      } else {
+        binerKeDes.innerText = '— invalid';
+      }
+
+      // OKTAL -> DESIMAL
+      let oktalStr = cleanStr(inputOktal.value);
+      let oktalValid = /^[0-7]+$/.test(oktalStr);
+      if (oktalValid && oktalStr.length > 0) {
+        try {
+          let desDariOktal = parseInt(oktalStr, 8);
+          if (!isNaN(desDariOktal)) oktalKeDes.innerText = desDariOktal;
+          else oktalKeDes.innerText = '?';
+        } catch { oktalKeDes.innerText = 'ERR'; }
+      } else {
+        oktalKeDes.innerText = '— invalid';
+      }
+
+      // HEKSA -> DESIMAL
+      let heksaStr = cleanStr(inputHeksa.value);
+      let heksaValid = /^[0-9A-F]+$/.test(heksaStr);
+      if (heksaValid && heksaStr.length > 0) {
+        try {
+          let desDariHeksa = parseInt(heksaStr, 16);
+          if (!isNaN(desDariHeksa)) heksaKeDes.innerText = desDariHeksa;
+          else heksaKeDes.innerText = '?';
+        } catch { heksaKeDes.innerText = 'ERR'; }
+      } else {
+        heksaKeDes.innerText = '— invalid';
+      }
+    }
+
+    // --- Sinkronisasi: jika desimal diubah, panggil updateDariDesimal + juga kita bisa sinkron balik?
+    // kita ingin panel kanan tetap independen, tapi untuk konsistensi jika orang mengubah desimal, tidak otomatis mengisi panel kanan.
+    // Namun agar nilai BCD dll sinkron, tetap panggil updateDariDesimal.
+    function fullUpdate() {
+      updateDariDesimal();
+      updateDariLain();
+    }
+
+    // event listeners
+    inputDesimal.addEventListener('input', () => {
+      updateDariDesimal();   // hanya perbarui panel kiri dan informasi tambahan
+      // biarkan panel kanan sesuai input manualnya
+    });
+
+    inputBiner.addEventListener('input', () => {
+      updateDariLain();
+    });
+    inputOktal.addEventListener('input', () => {
+      updateDariLain();
+    });
+    inputHeksa.addEventListener('input', () => {
+      updateDariLain();
+    });
+
+    // inisialisasi: jalankan semua
+    fullUpdate();
+
+    // opsional: jika input lain dikosongkan, tampilkan pesan, sudah di-handle
+    // juga tambahkan fallback jika nilai desimal di luar jangkauan gray dll
+    // Berikut penanganan agar inputDesimal tetap sinkron dengan bcd, twos, dll (sudah)
+    // Namun kadang nilai bcd, gray, ex3 tidak sinkron dengan perubahan dari biner/oktal/hex?
+    // Agar informasi tambahan (BCD dll) mengikuti angka desimal yang 'aktif', kita bisa sinkronkan dengan desimal dari panel kanan? 
+    // untuk UX lebih baik info tambahan mengikuti desimal dari input desimal (kiri) karena itu sumber utama.
+    // Tetap biarkan seperti itu. Jika ingin sinkron dari biner ke info tambahan, pengguna bisa copy ke desimal.
+    // Tambahkan tombol tiny? Tidak, biar sederhana.
+
+    // Bonus: klik pada hasil desimal panel kanan bisa mengisi inputDesimal? kita tambahkan sedikit kenyamanan.
+    // Kita buat agar angka hasil desimal dari biner/oktal/hex bisa diklik untuk mengisi input desimal.
+    const desBinerSpan = binerKeDes;
+    const desOktalSpan = oktalKeDes;
+    const desHeksaSpan = heksaKeDes;
+
+    function isNumeric(str) {
+      return /^-?\d+$/.test(str); // integer
+    }
+
+    desBinerSpan.style.cursor = 'pointer';
+    desOktalSpan.style.cursor = 'pointer';
+    desHeksaSpan.style.cursor = 'pointer';
+
+    desBinerSpan.addEventListener('click', (e) => {
+      let val = binerKeDes.innerText;
+      if (isNumeric(val)) {
+        inputDesimal.value = parseInt(val, 10);
+        updateDariDesimal();
+      }
+    });
+    desOktalSpan.addEventListener('click', (e) => {
+      let val = oktalKeDes.innerText;
+      if (isNumeric(val)) {
+        inputDesimal.value = parseInt(val, 10);
+        updateDariDesimal();
+      }
+    });
+    desHeksaSpan.addEventListener('click', (e) => {
+      let val = heksaKeDes.innerText;
+      if (isNumeric(val)) {
+        inputDesimal.value = parseInt(val, 10);
+        updateDariDesimal();
+      }
+    });
+  })();
+</script>
+
+<!-- penjelasan ringan -->
+<div style="text-align: center; margin-top: 1.2rem; color: #447c9e; font-size: 0.8rem; opacity: 0.7;">
+  ⬇️ klik hasil desimal (biner/oktal/heksa) untuk memindahkan ke input desimal • bilangan bulat
+</div>
+</body>
+</html>
