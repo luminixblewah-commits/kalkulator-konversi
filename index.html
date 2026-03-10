@@ -584,9 +584,9 @@
         function updateFromDecimal() {
             let val = decimalInput.value.trim();
             if (val === '' || isNaN(val)) {
-                val = '0';
-                decimalInput.value = '0';
-            }
+            decimalInput.value = '';
+        val = '';
+        }
             
             let num = parseInt(val, 10);
             if (isNaN(num)) num = 0;
