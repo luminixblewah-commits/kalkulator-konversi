@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konverter Bilangan Komputer - Full Screen</title>
+    <style>
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0f0c1f 0%, #1a1b3b 50%, #1f0f2c 100%);
+            color: #fff;
+        }
+
+        /* Full Screen Container */
+        .full-screen {
+            min-height: 100vh;
+            width: 100%;
+            padding: 2rem 4rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Responsive padding */
+        @media (max-width: 1024px) {
+            .full-screen {
+                padding: 1.5rem 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .full-screen {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #a78bfa, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: #94a3b8;
+            border-left: 4px solid #8b5cf6;
+            padding-left: 1.5rem;
+        }
+
+        /* Grid Layout */
+        .converter-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .converter-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            height: fit-content;
+        }
+
+        .card:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-header .emoji {
+            font-size: 2rem;
+            background: rgba(139, 92, 246, 0.2);
+            padding: 0.5rem;
+            border-radius: 1rem;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+
+        .input-prefix {
+            padding: 0 1rem;
+            color: #8b5cf6;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 0.5rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.1rem;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            outline: none;
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Result Box */
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .badge {
+            background: #8b5cf6;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .result-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #a78bfa;
+        }
+
+        .clickable-value {
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.2rem 0.8rem;
+            border-radius: 2rem;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .clickable-value:hover {
+            background: rgba(139, 92, 246, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Info Panel */
+        .info-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .info-panel h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            border-color: #8b5cf6;
+            transform: translateY(-3px);
+        }
+
+        .info-card strong {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: #a78bfa;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer-note {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            color: #a78bfa;
+            font-size: 0.9rem;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1b4b;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .full-screen {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .result-value {
+                font-size: 1rem;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="full-screen">
+        <!-- Header -->
+        <header class="header">
+            <h1>⚡ Number Base Converter</h1>
+            <div class="subtitle">Konversi instan bilangan komputer • Biner • Desimal • Oktal • Heksadesimal • BCD • Gray Code</div>
+        </header>
+
+        <!-- Main Converter Grid -->
+        <div class="converter-grid">
+            <!-- Panel Kiri: Desimal ke Lainnya -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="emoji">🔢</span>
+                    <h2>Desimal → Lainnya</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label>Masukkan angka desimal (basis 10)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">(10)</span>
+                        <input type="number" id="decimalInput" value="42" placeholder="Contoh: 42">
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">
+                            <span>Biner</span>
+                            <span class="badge">bin</span>
+                        </span>
+                        <span class="result-value" id="decimalToBinary">101010</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">
+                            <span>Oktal</span>
+                            <span class="badge">oct</span>
+                        </span>
+                        <span class="result-value" id="decimalToOctal">52</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">
+                            <span>Heksadesimal</span>
+                            <span class="badge">hex</span>
+                        </span>
+                        <span class="result-value" id="decimalToHex">2A</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Kanan: Lainnya ke Desimal -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="emoji">🔄</span>
+                    <h2>Lainnya → Desimal</h2>
+                </div>
+                
+                <div class="input-group">
+                    <label>Biner (0/1)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">0b</span>
+                        <input type="text" id="binaryInput" value="1010" placeholder="Contoh: 1010">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Oktal (0-7)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">0o</span>
+                        <input type="text" id="octalInput" value="52" placeholder="Contoh: 52">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Heksadesimal (0-9, A-F)</label>
+                    <div class="input-wrapper">
+                        <span class="input-prefix">0x</span>
+                        <input type="text" id="hexInput" value="2A" placeholder="Contoh: 2A">
+                    </div>
+                </div>
+
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Desimal dari Biner</span>
+                        <span class="result-value clickable-value" id="binaryToDecimal" data-tooltip="Klik untuk pindah ke input desimal">10</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Desimal dari Oktal</span>
+                        <span class="result-value clickable-value" id="octalToDecimal" data-tooltip="Klik untuk pindah ke input desimal">42</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Desimal dari Heksa</span>
+                        <span class="result-value clickable-value" id="hexToDecimal" data-tooltip="Klik untuk pindah ke input desimal">42</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Informasi Tambahan -->
+        <div class="info-panel">
+            <h3>📊 Representasi Bilangan Lainnya</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <strong>BCD (8421)</strong>
+                    <span id="bcdValue">0100 0010</span>
+                </div>
+                <div class="info-card">
+                    <strong>Gray Code (4-bit)</strong>
+                    <span id="grayValue">0011</span>
+                </div>
+                <div class="info-card">
+                    <strong>Excess-3</strong>
+                    <span id="excess3Value">0111 0101</span>
+                </div>
+                <div class="info-card">
+                    <strong>Komplemen-2 (8-bit)</strong>
+                    <span id="twosComplementValue">00101010</span>
+                </div>
+                <div class="info-card">
+                    <strong>ASCII (karakter)</strong>
+                    <span id="asciiValue">'*' (42)</span>
+                </div>
+                <div class="info-card">
+                    <strong>Roman Numerals</strong>
+                    <span id="romanValue">XLII</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div>© 2024 Number Base Converter • Full Screen Edition</div>
+            <div class="footer-note">
+                ⚡ Klik hasil desimal untuk memindahkan ke input atas
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Ambil semua elemen yang diperlukan
+        const decimalInput = document.getElementById('decimalInput');
+        const binaryInput = document.getElementById('binaryInput');
+        const octalInput = document.getElementById('octalInput');
+        const hexInput = document.getElementById('hexInput');
+        
+        // Elemen hasil
+        const decimalToBinary = document.getElementById('decimalToBinary');
+        const decimalToOctal = document.getElementById('decimalToOctal');
+        const decimalToHex = document.getElementById('decimalToHex');
+        
+        const binaryToDecimal = document.getElementById('binaryToDecimal');
+        const octalToDecimal = document.getElementById('octalToDecimal');
+        const hexToDecimal = document.getElementById('hexToDecimal');
+        
+        // Elemen info tambahan
+        const bcdValue = document.getElementById('bcdValue');
+        const grayValue = document.getElementById('grayValue');
+        const excess3Value = document.getElementById('excess3Value');
+        const twosComplementValue = document.getElementById('twosComplementValue');
+        const asciiValue = document.getElementById('asciiValue');
+        const romanValue = document.getElementById('romanValue');
+        
+        // Helper functions
+        function cleanInput(str, type = 'string') {
+            let cleaned = str.trim().replace(/\s+/g, '');
+            if (type === 'hex') {
+                cleaned = cleaned.toUpperCase();
+            }
+            return cleaned;
+        }
+        
+        function isValidBinary(str) {
+            return /^[01]+$/.test(str);
+        }
+        
+        function isValidOctal(str) {
+            return /^[0-7]+$/.test(str);
+        }
+        
+        function isValidHex(str) {
+            return /^[0-9A-Fa-f]+$/.test(str);
+        }
+        
+        function decimalToBCD(num) {
+            return num.toString().split('').map(d => {
+                return parseInt(d, 10).toString(2).padStart(4, '0');
+            }).join(' ');
+        }
+        
+        function decimalToGray(num) {
+            let n = num & 0xF;
+            return (n ^ (n >> 1)).toString(2).padStart(4, '0');
+        }
+        
+        function decimalToExcess3(num) {
+            return num.toString().split('').map(d => {
+                let digit = parseInt(d, 10);
+                return (digit + 3).toString(2).padStart(4, '0');
+            }).join(' ');
+        }
+        
+        function decimalToTwosComplement(num) {
+            num = parseInt(num);
+            if (num >= -128 && num <= 127) {
+                if (num >= 0) {
+                    return num.toString(2).padStart(8, '0');
+                } else {
+                    return (256 + num).toString(2).padStart(8, '0');
+                }
+            }
+            return 'N/A';
+        }
+        
+        function decimalToRoman(num) {
+            num = parseInt(num);
+            if (num < 1 || num > 3999) return 'N/A';
+            
+            const romanNumerals = [
+                ['M', 1000], ['CM', 900], ['D', 500], ['CD', 400],
+                ['C', 100], ['XC', 90], ['L', 50], ['XL', 40],
+                ['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]
+            ];
+            
+            let result = '';
+            for (let [roman, value] of romanNumerals) {
+                while (num >= value) {
+                    result += roman;
+                    num -= value;
+                }
+            }
+            return result;
+        }
+        
+        // Update dari desimal
+        function updateFromDecimal() {
+            let val = decimalInput.value.trim();
+            if (val === '' || isNaN(val)) {
+                val = '0';
+                decimalInput.value = '0';
+            }
+            
+            let num = parseInt(val, 10);
+            if (isNaN(num)) num = 0;
+            
+            decimalToBinary.textContent = num.toString(2);
+            decimalToOctal.textContent = num.toString(8);
+            decimalToHex.textContent = num.toString(16).toUpperCase();
+            
+            bcdValue.textContent = decimalToBCD(num);
+            grayValue.textContent = decimalToGray(num);
+            excess3Value.textContent = decimalToExcess3(num);
+            twosComplementValue.textContent = decimalToTwosComplement(num);
+            
+            if (num >= 32 && num <= 126) {
+                asciiValue.textContent = `'${String.fromCharCode(num)}' (${num})`;
+            } else if (num >= 0 && num <= 127) {
+                asciiValue.textContent = `(control char)`;
+            } else {
+                asciiValue.textContent = `(out of range)`;
+            }
+            
+            romanValue.textContent = decimalToRoman(num);
+        }
+        
+        // Update dari biner
+        function updateFromBinary() {
+            let binStr = cleanInput(binaryInput.value);
+            if (isValidBinary(binStr) && binStr.length > 0) {
+                let num = parseInt(binStr, 2);
+                if (!isNaN(num)) {
+                    binaryToDecimal.textContent = num;
+                } else {
+                    binaryToDecimal.textContent = 'Error';
+                }
+            } else {
+                binaryToDecimal.textContent = binStr.length > 0 ? 'Invalid' : '-';
+            }
+        }
+        
+        // Update dari oktal
+        function updateFromOctal() {
+            let octStr = cleanInput(octalInput.value);
+            if (isValidOctal(octStr) && octStr.length > 0) {
+                let num = parseInt(octStr, 8);
+                if (!isNaN(num)) {
+                    octalToDecimal.textContent = num;
+                } else {
+                    octalToDecimal.textContent = 'Error';
+                }
+            } else {
+                octalToDecimal.textContent = octStr.length > 0 ? 'Invalid' : '-';
+            }
+        }
+        
+        // Update dari heksa
+        function updateFromHex() {
+            let hexStr = cleanInput(hexInput.value, 'hex');
+            if (isValidHex(hexStr) && hexStr.length > 0) {
+                let num = parseInt(hexStr, 16);
+                if (!isNaN(num)) {
+                    hexToDecimal.textContent = num;
+                } else {
+                    hexToDecimal.textContent = 'Error';
+                }
+            } else {
+                hexToDecimal.textContent = hexStr.length > 0 ? 'Invalid' : '-';
+            }
+        }
+        
+        // Event listeners
+        decimalInput.addEventListener('input', updateFromDecimal);
+        binaryInput.addEventListener('input', updateFromBinary);
+        octalInput.addEventListener('input', updateFromOctal);
+        hexInput.addEventListener('input', updateFromHex);
+        
+        // Fungsi pindah ke desimal
+        function moveToDecimal(value) {
+            if (value && !isNaN(value) && value !== '-' && value !== 'Invalid' && value !== 'Error') {
+                decimalInput.value = parseInt(value, 10);
+                updateFromDecimal();
+            }
+        }
+        
+        binaryToDecimal.addEventListener('click', () => moveToDecimal(binaryToDecimal.textContent));
+        octalToDecimal.addEventListener('click', () => moveToDecimal(octalToDecimal.textContent));
+        hexToDecimal.addEventListener('click', () => moveToDecimal(hexToDecimal.textContent));
+        
+        // Initialize
+        updateFromDecimal();
+        updateFromBinary();
+        updateFromOctal();
+        updateFromHex();
+    </script>
+</body>
+</html>
